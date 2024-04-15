@@ -1,0 +1,328 @@
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<div class="clinically_information padding_200">
+<div class="pageContainer">
+  <div class="header">
+    {% if section.settings.heading != blank %}<h3>{{ section.settings.heading }}</h3>{% endif %}
+    {% if section.settings.description != blank %}<p>{{ section.settings.description }}</p>{% endif %}
+  </div>
+</div>
+<div class="slick-main">
+  {% for block in section.blocks %}
+    <div class="slider-inner">
+      <div class="slider_inner_col">
+        <div class="slider_inner_col_inner">
+          {% if block.settings.expert_image  != blank %}
+          <div class="image">
+            <img src="{{ block.settings.expert_image | img_url:'' }}">
+          </div>
+          {% endif %}
+          <div class="expert_content">
+            {% if block.settings.title != blank %}<h5>{{ block.settings.title }}</h5>{% endif %}
+            {% if block.settings.sub-title != blank %}<p class="sub-infor-expert">{{ block.settings.sub-title }}</p>{% endif %}
+            {% if block.settings.content != blank %}<p>{{ block.settings.content }}</p>{% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+</div>
+{% schema %}
+  {
+    "name": "Clinically main",
+    "settings": [
+      {
+        "type":"text",
+        "id":"heading",
+        "label":"Add heading"
+      },
+      {
+        "type":"textarea",
+        "id":"description",
+        "label":"Add description"
+      }
+    ],
+    "blocks":[
+      {
+        "type":"image_with_text",
+        "name":"image",
+        "settings":[
+          {
+            "type":"image_picker",
+            "id":"expert_image",
+            "label":"Add expert image"
+          },
+          {
+            "type":"text",
+            "id":"title",
+            "label":"Expert title"
+          },
+          {
+            "type":"text",
+            "id":"sub-title",
+            "label":"Expert sub content"
+          },
+          {
+            "type":"textarea",
+            "id":"content",
+            "label":"Expert content"
+          }
+        ]
+      }
+    ],
+    "presets":[
+      {
+        "name":"Clinically main"
+      }
+    ]
+  }
+{% endschema %}
+
+<script>
+      // slider
+  $('.slick-main')
+  .on('init', () => {
+    $('.slick-slide[data-slick-index="-2"]').addClass('lt2');
+    $('.slick-slide[data-slick-index="-1"]').addClass('lt1');
+    $('.slick-slide[data-slick-index="1"]').addClass('gt1');
+    $('.slick-slide[data-slick-index="2"]').addClass('gt2');
+})
+  .slick({
+  centerMode: true,
+  centerPadding: "13%",
+  draggable: false,
+  dots:true,
+  slidesToShow: 3,
+  responsive: [
+    {
+      breakpoint: 1380,
+      settings: {
+        slidesToShow: 1,
+        centerPadding: "35%",
+      }
+    },
+    {
+      breakpoint: 1081,
+      settings: {
+        centerPadding: "0"
+      }
+    },
+    {
+      breakpoint: 576,
+      settings: {
+        centerPadding: "10%",
+        slidesToShow: 1,
+      }
+    }
+  ]
+  }).on('beforeChange', (event, slick, current, next) => {
+  $('.slick-slide.gt2').removeClass('gt2');
+  $('.slick-slide.gt1').removeClass('gt1');
+  $('.slick-slide.lt1').removeClass('lt1');
+  $('.slick-slide.lt2').removeClass('lt2');
+
+  const lt2 = (current < next && current > 0) ? current - 1 : next - 2;
+  const lt1 = (current < next && current > 0) ? current : next - 1;
+  const gt1 = (current < next || next === 0) ? next + 1 : current;
+  const gt2 = (current < next || next === 0) ? next + 2 : current + 1;
+
+  $(`.slick-slide[data-slick-index="${lt2}"]`).addClass('lt2');
+  $(`.slick-slide[data-slick-index="${lt1}"]`).addClass('lt1');
+  $(`.slick-slide[data-slick-index="${gt1}"]`).addClass('gt1');
+  $(`.slick-slide[data-slick-index="${gt2}"]`).addClass('gt2');
+
+  // Clone processing when moving from 5 to 0
+  if (current === 5 && next === 0) {
+    $(`.slick-slide[data-slick-index="${current - 1}"]`).addClass('lt2');
+    $(`.slick-slide[data-slick-index="${current}"]`).addClass('lt1');
+    $(`.slick-slide[data-slick-index="${current + 2}"]`).addClass('gt1');
+    $(`.slick-slide[data-slick-index="${current + 3}"]`).addClass('gt2');
+  }
+
+  // Clone processing when moving from 0 to 5
+  if (current === 0 && next === 5) {
+    $(`.slick-slide[data-slick-index="${current - 1}"]`).addClass('gt2');
+    $(`.slick-slide[data-slick-index="${current}"]`).addClass('gt1');
+    $(`.slick-slide[data-slick-index="${current - 2}"]`).addClass('lt1');
+    $(`.slick-slide[data-slick-index="${current - 3}"]`).addClass('lt2');
+  }
+
+  console.log('beforeChange', current, ':', lt2, lt1, next, gt1, gt2);
+});
+</script>
+
+<style>
+    .padding_200{
+  padding:200px 0;
+}
+.clinically_information .header h3{
+font-size: 55px;
+line-height: 60px;
+letter-spacing: -0.8px;
+font-weight: 400;
+text-align: center;
+font-family: PP Editorial New;
+margin-bottom:50px;
+}
+.clinically_information .header p{
+font-size: 30px;
+line-height: 40px;
+text-align: center;
+letter-spacing: -0.8px;
+}
+.clinically_information .header{
+  margin-bottom:60px;
+}
+.slick-main{
+padding-bottom:100px;
+}
+.slick-main .slider_inner_col {
+display: block;
+position: relative;
+transform: translate(0, 0) scale(.4);
+transition: all .4s ease;
+opacity: .5;
+}
+.slider_inner_col_inner{
+display:flex;
+min-height: 300px;
+align-items: center;
+}
+.expert_content{
+display:none;
+}
+.slick-slide.slick-center .expert_content{
+display:block;
+}
+.slick-slide.slick-center .slider_inner_col_inner{
+margin:0 -83%;
+align-items: center;
+}
+.slick-slide.slick-center .slider_inner_col_inner .image{
+      width: 100%;
+    max-width: 300px;
+}
+.slick-slide.slick-center .slider_inner_col_inner .image img{
+      width: 100%;
+}
+.slick-main .slider_inner_col .expert_content{
+max-width: calc(100% - 300px);
+width: 100%;
+padding-left: 20px;
+}
+.expert_content h5{
+font-size: 36px;
+line-height: 34px;
+color: #1F262D;
+font-weight: 800;
+font-family: PP Editorial New;
+margin-bottom: 15px;
+}
+.expert_content p{
+font-size: 16px;
+line-height: 19px;
+color: #666666;
+}
+.expert_content p:last-child{
+  font-size: 24px;
+  line-height: 30px;
+  color: #666666;
+  max-width: 484px;
+  letter-spacing: -0.8px;
+}
+.expert_content p.sub-infor-expert{
+font-size: 22px;
+line-height: 28px;
+color: #000;
+margin-bottom: 15px;
+}
+
+.slick-main .slick-slide{
+padding:0 80px;
+}
+.slick-slide.lt2 .slider_inner_col {
+transform: translate(10%, 0) scale(.6);
+}
+.slick-slide.lt1 .slider_inner_col {
+opacity: .7;
+transform: translate(5%, 0) scale(.8);
+margin-left: -55%;
+max-width: 100%;
+}
+.slick-slide.gt1 .slider_inner_col {
+opacity: .7;
+transform: translate(-5%, 0) scale(.8);
+margin-right: -55%;
+max-width: 100%;
+float: inline-end;
+}
+.slick-slide.gt2 .slider_inner_col {
+transform: translate(-10%, 0) scale(.6);
+}
+.slick-slide.slick-center .slider_inner_col {
+z-index: 1;
+transform: scale(1);
+opacity: 1;
+color: #e67e22;
+}
+
+.slick-main .slick-prev,
+.slick-main .slick-next{
+  position: absolute;
+  bottom:0;
+  appearance: none;
+  margin-top: -10px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  color: transparent;
+  outline: none;
+  z-index: 100;
+}
+.slick-main .slick-prev {
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="27" height="24" viewBox="0 0 28 24" fill="none"><path d="M11.9999 -3.22314e-06L14.6949 2.74576L7.52536 10.0678L27.0508 10.0678L27.0508 13.9322L7.52536 13.9322L14.6949 21.2542L11.9999 24L-5.99861e-05 12L11.9999 -3.22314e-06Z" fill="%23666666"/></svg>');
+  width: 27px;
+  height: 24px;
+  left: 12%;
+}
+.slick-main .slick-next {
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="27" height="24" viewBox="0 0 28 24" fill="none"><path d="M16.0001 24L13.3051 21.2542L20.4746 13.9322L0.949216 13.9322L0.949217 10.0678L20.4746 10.0678L13.3051 2.74577L16.0001 2.63157e-06L28.0001 12L16.0001 24Z" fill="%23666666"/></svg>');
+  width: 27px;
+  height: 24px;
+  right: 12%;
+}
+.slick-main .slick-dots{
+display: flex;
+list-style-type: none;
+position: absolute;
+transform: translateX(-50%);
+left: 50%;
+bottom: 8px;
+}
+.slick-main .slick-dots li{
+  padding:0 2px;
+}
+.slick-main .slick-dots button{
+font-size: 0;
+width: 8px;
+height: 8px;
+background: rgb(0 0 0 / 30%);
+border-radius: 50%;
+}
+.slick-main .slick-dots .slick-active button{
+  background: rgb(0 0 0 / 70%);
+}
+@media(max-width:575px){
+    .slick-slide.slick-center .slider_inner_col_inner .image{max-width:200px;}
+  .slick-slide.gt1 .slider_inner_col{transform: none;margin-right: 0;}
+  .slick-slide.lt1 .slider_inner_col{transform: none;margin-left: 0;}
+  .slider_inner_col_inner{min-height:200px;}
+  .slick-slide.slick-center .slider_inner_col_inner{margin:0;}
+  .slick-main{margin:0 -20px;padding-bottom:45px;}
+  .slick-main .slider_inner_col .expert_content,.slick-main .slick-slide{padding:0;}
+  .expert_content p:last-child{font-size:18px;}
+  .expert_content h5{font-weight:400;}
+  .padding_200{padding:50px 0;}
+}
+</style>
